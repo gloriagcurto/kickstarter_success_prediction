@@ -52,9 +52,9 @@ print(json_df.head())
 
 deserialized_df = deserialize_in_batch(json_df)
 #deserialized_df = kcks[['backers_count','blurb', 'country']]
-'''
+
 deserialized_df.to_hdf('../../data/deserialized.h5', key='kickstarter', mode='w')
 
 print(f'Shape of deserialized: {deserialized_df.shape}')
 print(f'Columns of deserialized: {deserialized_df.columns}')
-'''
+
