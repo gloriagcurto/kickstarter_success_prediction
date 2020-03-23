@@ -19,14 +19,12 @@ def deserialize_in_batch (df):
     deserialized = pd.DataFrame()
     for cname in df.columns: 
         print(cname)
-        cname_df = pd.DataFrame()
-        for row in df[cname]:
-            # Decode the JSON string 
-            col_dict = json.loads(row)
-            cname_df = cname_df.append(pd.json_normalize(col_dict), ignore_index=True)
-        
+        frames = [ pd.json_normalize(json.loads(row)) for row in df[cname] ]
+        cname_df = pd.concat(frames, axis=0)
+        cname_df['new_index'] = range(len(frames))
+        cname_df.set_index('new_index', inplace=True)
         cname_df.columns =  map(lambda x: df[cname].name + '_' + x , cname_df.columns)
-        deserialized.append(cname_df, ignore_index=True)              
+        deserialized =  pd.concat([deserialized, cname_df], axis=1)              
     return deserialized
 
 #h = pd.read_hdf("../../data/deserialized.h5", key="kickstarter")
@@ -54,28 +52,9 @@ print(json_df.head())
 
 deserialized_df = deserialize_in_batch(json_df)
 #deserialized_df = kcks[['backers_count','blurb', 'country']]
-
+'''
 deserialized_df.to_hdf('../../data/deserialized.h5', key='kickstarter', mode='w')
 
 print(f'Shape of deserialized: {deserialized_df.shape}')
 print(f'Columns of deserialized: {deserialized_df.columns}')
-
-
-
-'''
-category.drop(['id', 'position', 'parent_id', 'color', 'urls.web.discover'], axis = 1, inplace=True)
-category.head()
-
-
-
-
-
-#category.columns = ['category_name', 'category_slug', 'category_parent_name']
-key = 'foo'
-category.columns =  map(lambda x: key + '_' + x , category.columns)
-category.head()
-
-
-# Retrieve information from "creator".
-
 '''
