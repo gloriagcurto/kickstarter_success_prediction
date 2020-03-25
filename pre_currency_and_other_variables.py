@@ -49,16 +49,19 @@ for column in ['disable_communication', 'spotlight', 'staff_pick']:
 no_json_dates.iloc[:,5:15].head()
 
 # Dummification currency
+#keep currency for dataviz
+no_json_dates['currency_orig'] = no_json_dates['currency']
+
 no_json_dates_dummied = pd.get_dummies(no_json_dates, prefix_sep='_', columns=['currency'], drop_first=True)
 
 print(f'New column names: {no_json_dates_dummied.columns}')
 print(f'New dimmensions: {no_json_dates_dummied.shape}')
-no_json_dates_dummied.head()
+print(no_json_dates_dummied.head())
 
 # 'state' pre-processing
 print(no_json_dates_dummied.state.agg(['count', 'size', 'nunique']))
 
-print(no_json_dates_dummied.state.unique())
+print(no_json_dates_dummied['state'].unique())
 
 # Group ['failed' 'canceled' 'suspended'] as 'failed' in 'state_grouped'
 no_json_dates_dummied['state_grouped'] = no_json_dates_dummied['state'].replace(['canceled', 'suspended'],['failed', 'failed'])

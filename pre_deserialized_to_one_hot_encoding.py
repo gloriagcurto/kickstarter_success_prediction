@@ -13,7 +13,7 @@ http://gloriagcurto.info
 
 import pandas as pd
 
-deserialized = pd.read_hdf("../data/deserialized.h5")
+deserialized = pd.read_hdf("../../data/deserialized.h5")
 
 # Dimensions and missing values
 
@@ -133,6 +133,9 @@ print(deserialized.iloc[:,3:15].head())
 
 # One hot encoding of categorical variables.
 # Keep the original columns for dataviz.
+deserialized['category_name_ori'] = deserialized['category_name']
+deserialized['category_parent_name_ori'] = deserialized['category_parent_name']
+deserialized['location_expanded_country_ori'] = deserialized['location_expanded_country']
 # Columns to recode:
 # Index(['category_name', 'category_parent_name', 'location_expanded_country'],
 
@@ -145,5 +148,5 @@ print(deserialized_dummied.head())
 #save in hdf5 format
 #remember to drop columns=['category_name', 'category_parent_name', 'location_expanded_country'] in features matrix
 
-deserialized_dummied.to_hdf("../data/deserialized_dummied.h5", key = 'deserialized_dummied')
+deserialized_dummied.to_hdf("../../data/deserialized_dummied.h5", key = 'deserialized_dummied')
 
