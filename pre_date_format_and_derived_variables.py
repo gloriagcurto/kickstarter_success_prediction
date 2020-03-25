@@ -4,6 +4,9 @@
 '''
 Pre-processing of Kickstarter_2020-02-13T03_20_04_893Z.
 Dates and derived variables pre-procesing in columns not JSON encoded.
+Input Filename: joined.csv
+Output Filename: no_json_df_dates_variables.h5
+
 
 Copyright (c) 2020 Gloria G. Curto.
 http://gloriagcurto.info
@@ -103,4 +106,6 @@ no_json_df.to_hdf("../../data/no_json_df_dates_variables.h5", key = 'dates_varia
 '''
 Next:
 Currency and other variables
+remember to drop columns=['category_name', 'category_parent_name', 
+'location_expanded_country'] in features matrix
 '''

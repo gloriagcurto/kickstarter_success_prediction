@@ -4,6 +4,8 @@
 '''
 Pre-processing of Kickstarter_2020-02-13T03_20_04_893Z.
 Currency, country, binary encoding, one hot encoding of no JSON encoded columns, state pre-procesing.
+Input Filename: no_json_df_dates_variables.h5
+Output Filename: no_json_df_dates_other_variables.h5
 
 Copyright (c) 2020 Gloria G. Curto.
 http://gloriagcurto.info
@@ -80,4 +82,6 @@ There are 6651 projects with 'live' status. Because they are not closed, they ar
 and those rows have to be drop when we join all data together.
 blurb, name = text mining
 id = use as index at the end
+Remember to drop columns=['category_name', 'category_parent_name',
+'location_expanded_country'] in features matrix
 '''
