@@ -98,6 +98,11 @@ no_json_df["found_rising_duration"] = (no_json_df['state_changed_at']- no_json_d
 
 print(no_json_df.iloc[0:4,35:40])
 
+#Compute project set up duration
+no_json_df["project_set_up"] = (no_json_df['launched_at']- no_json_df["created_at"])/np.timedelta64(1,'D')
+
+no_json_df.iloc[0:4,35:40]
+
 print(no_json_df.columns)
 
 no_json_df.to_hdf("../../data/no_json_df_dates_variables.h5", key = 'dates_variables')
