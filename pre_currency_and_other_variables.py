@@ -1,9 +1,9 @@
-                                            #!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 '''
 Pre-processing of Kickstarter_2020-02-13T03_20_04_893Z.
-Dates, currency, country, binary encoding, one hot encoding, state pre-procesing.
+Currency, country, binary encoding, one hot encoding of no JSON encoded columns, state pre-procesing.
 
 Copyright (c) 2020 Gloria G. Curto.
 http://gloriagcurto.info
@@ -71,9 +71,8 @@ print(no_json_dates_dummied['state_grouped'].agg(['count', 'size', 'nunique']))
 print(no_json_dates_dummied['state_grouped'].value_counts())
 
 
-no_json_dates_dummied.to_hdf("../data/no_json_df_dates_other_variables.h5", key = 'other_variables')
+no_json_dates_dummied.to_hdf("../../data/no_json_df_dates_other_variables.h5", key = 'other_variables')
 
-no_json_df.to_hdf("../../data/no_json_df_dates_variables.h5", key = 'dates_variables')
 
 '''
 Next:

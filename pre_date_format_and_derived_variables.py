@@ -1,15 +1,18 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-# coding: utf-8
+'''
+Pre-processing of Kickstarter_2020-02-13T03_20_04_893Z.
+Dates and derived variables pre-procesing in columns not JSON encoded.
 
-# Select columns not JSON encoded
-
-# In[29]:
-
+Copyright (c) 2020 Gloria G. Curto.
+http://gloriagcurto.info
+'''
 
 import pandas as pd
 import numpy as np
 
-kcks = pd.read_csv("../data/joined.csv")
+kcks = pd.read_csv("../../data/joined.csv")
 print(f'Original shape: {kcks.shape}')
 print(f'Original columns: {kcks.columns}')
 
@@ -23,75 +26,35 @@ print(f'Shape after drop rows with na: {kcks.shape}')
 print(f'Shape after drop rows with na: {kcks.shape}')
 #print(f'Tail: {kcks.tail()}')
 
-
-# In[30]:
-
-
 # Columns in JSON format are: category, creator, location, photo, profile, urls. They are treated separately for now.
 
 # Drop the JSON format columns into a new df
 no_json_df = kcks.drop(['category', 'creator', 'location', 'photo', 'profile', 'urls'], axis=1)
-no_json_df.head()
-
+print(no_json_df.head())
 
 # Drop country and country_displayable_name because they are redundant with varaibles extracted from the JSON encoded columns.
 # Drop currency_symbol
-
-# In[32]:
-
-
 no_json_df.drop(['country', 'country_displayable_name', 'currency_symbol'], axis=1, inplace=True)
-no_json_df.iloc[:,0:10].head()
-
+print(no_json_df.iloc[:,0:10].head())
 
 # Drop source_url	
-
-# In[33]:
-
-
 no_json_df.drop(['source_url'], axis=1, inplace=True)
 no_json_df.iloc[:,10:20].head()
-
-
-# In[34]:
-
-
 no_json_df.iloc[:,20:30].head()
 
-
 # Convert unix dates to datetime in 'created_at', 'deadline', 'launched_at', 'state_changed_at'
-
-# In[35]:
-
-
-no_json_df.columns
-
-
-# In[37]:
-
+print(no_json_df.columns)
 
 date_cols = ['created_at', 'deadline', 'launched_at', 'state_changed_at']
 
 for column in date_cols:
         no_json_df[column] = pd.to_datetime(no_json_df[column],yearfirst=True, unit='s').dt.normalize() #normalize removes time
 
+print(no_json_df.iloc[:,0:15].head())
 
-# In[38]:
-
-
-no_json_df.iloc[:,0:15].head()
-
-
-# In[27]:
-
-
-no_json_df.iloc[:,15:25].head()
-
+print(no_json_df.iloc[:,15:25].head())
 
 # Weekday columns for each date variable
-
-# In[48]:
-
 
 date_cols = ['created_at', 'deadline', 'launched_at', 'state_changed_at']
 
@@ -99,13 +62,9 @@ for column in date_cols:
     new = "weekday_" + no_json_df[column].name 
     no_json_df[new] = no_json_df[column].dt.weekday
 print(no_json_df.columns)
-no_json_df.iloc[0:4,20:30]
-
+print(no_json_df.iloc[0:4,20:30])
 
 #  Month columns for each date variable
-
-# In[50]:
-
 
 date_cols = ['created_at', 'deadline', 'launched_at', 'state_changed_at']
 
@@ -113,13 +72,9 @@ for column in date_cols:
     new = "month_" + no_json_df[column].name 
     no_json_df[new] = no_json_df[column].dt.month
 print(no_json_df.columns)
-no_json_df.iloc[0:4,27:40]
-
+print(no_json_df.iloc[0:4,27:40])
 
 # Year columns for each date variable
-
-# In[51]:
-
 
 date_cols = ['created_at', 'deadline', 'launched_at', 'state_changed_at']
 
@@ -127,41 +82,25 @@ for column in date_cols:
     new = "year_" + no_json_df[column].name 
     no_json_df[new] = no_json_df[column].dt.year
 print(no_json_df.columns)
-no_json_df.iloc[0:4,30:45]
-
+print(no_json_df.iloc[0:4,30:45])
 
 # Compute initial_found_rising_duration
 
-# In[63]:
-
-
 no_json_df["initial_found_rising_duration"] = (no_json_df['deadline']- no_json_df["launched_at"])/np.timedelta64(1,'D')
 
-no_json_df.iloc[0:4,35:40]
+print(no_json_df.iloc[0:4,35:40])
 
-
-# In[ ]:
-
-
-Compute found_rising_duration
-
-
-# In[64]:
-
+#Compute found_rising_duration
 
 no_json_df["found_rising_duration"] = (no_json_df['state_changed_at']- no_json_df["launched_at"])/np.timedelta64(1,'D')
 
-no_json_df.iloc[0:4,35:40]
-
-
-# In[65]:
-
+print(no_json_df.iloc[0:4,35:40])
 
 print(no_json_df.columns)
 
+no_json_df.to_hdf("../../data/no_json_df_dates_variables.h5", key = 'dates_variables')
 
-# In[67]:
-
-
-no_json_df.to_hdf("../data/no_json_df_dates_variables.h5", key = 'dates_variables')
-
+'''
+Next:
+Currency and other variables
+'''
