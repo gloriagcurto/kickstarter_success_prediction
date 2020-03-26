@@ -54,22 +54,17 @@ print(get_english_score("Tämä on toinen projekti uuden alustan rakentamiseksi"
 '''
 Filter rows with an score lower than 0.7 in blurb or name
 '''
-header_already_written = False
 
-with open("../../data/data_english.csv", "wt") as f_out:  # Create english only output file
-    csv_writer = csv.writer(f_out)
-    
-    df = pd.read_hdf('../../data/data_wo_text_mining.h5')
-    for row in df.itertuples(index=False):
-        # Write header
-        if row[0] == 'backers_count' and not header_already_written: 
-            csv_writer.writerow(row)
-            header_already_written = True
-            continue 
-            
-        blurb_score = get_english_score(row[1]) # 'blurb'.index = 1
-        name_score = get_english_score(row[7]) # 'name'.index = 7
-        # Write row
-        if blurb_score >= 0.7 and name_score >=0.7 :
-            csv_writer.writerow(row)
-                 
+df = pd.read_hdf('../../data/data_wo_text_mining.h5')
+english_df = pd.DataFrame()
+keep = []    
+for row in df.itertuples(index=False):
+    blurb_score = get_english_score(row[1]) # 'blurb'.index = 1
+    name_score = get_english_score(row[7]) # 'name'.index = 7
+    # Write row
+    if blurb_score >= 0.7 and name_score >=0.7 :
+        keep.append(row)
+
+english_df = pd.DataFrame(keep, columns=df.columns)
+
+english_df.to_hdf("../../data/data_english.h5", key="english")
