@@ -39,9 +39,9 @@ From language detected compute a variable 'English' with english = 1, other lang
 '''
 '''
 def translate_to_english (df):
-    '''
+'''
     #Translate to english a df containing only the columns to translate
-    '''
+'''
     translated = pd.DataFrame()
     translator = Translator()
     trans_df = pd.DataFrame(columns=['en_text', 'language'])
@@ -77,7 +77,7 @@ print(f'Dimensions data_trans: {data_trans.shape}')
 translated = translate_to_english(data_trans)
 
 '''
-
+'''
 #data = ['Dobrý deň', 'majestátny orol', 'krehká dohoda']
 
 #translated = translator.translate(data_wo_text_mining['blurb'][3], dest='en')
