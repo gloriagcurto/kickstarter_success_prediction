@@ -70,6 +70,6 @@ with open("../../data/data_english.csv", "wt") as f_out:  # Create english only 
         blurb_score = get_english_score(row[1]) # 'blurb'.index = 1
         name_score = get_english_score(row[7]) # 'name'.index = 7
         # Write row
-        if blurb_score >= 0.7 and name_score >=0.7:
+        if blurb_score >= 0.7 and name_score >=0.7 :
             csv_writer.writerow(row)
                  
