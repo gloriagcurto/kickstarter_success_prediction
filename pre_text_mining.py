@@ -3,69 +3,66 @@
 
 """
 Pre-processing of Kickstarter_2020-02-13T03_20_04_893Z.
-Text mining. Tokenize, frecuent words by category
+Text mining. Tokenize, frequent words by category
 Input Filename:  data_english.h5
 Output Filename: data_text_mining.h5
 
 Copyright (c) 2020 Gloria G. Curto.
 http://gloriagcurto.info
 """
-
 import pandas as pd
-from nltk.tokenize import word_tokenize
+import wordcloud
+import numpy as np
 from nltk.corpus import stopwords
 
-def tokenize_columns (df, cnames):
-    '''
-    tokenize words in a set of columns
-    '''
-    word_tok = pd.DataFrame()
-    text_min_df = pd.DataFrame()
-    for cname in cnames: 
-        print(cname)
-        row_words = [word_tokenize(row, language='english') for row in df[cname] ]
-        word_tok = pd.concat([word_tok, row_words], axis=0)
-        word_tok['new_index'] = range(len(row_words))
-        word_tok.set_index('new_index', inplace=True)
-        word_tok.columns =  map(lambda x: df[cname].name + '_word_tok' + x , word_tok.columns)
-        text_min_df =  pd.concat([text_min_df, word_tok], axis=1)              
-    return text_min_df
-
-
-
+# Generate text column
 df = pd.read_hdf('../../data/data_english.h5')
-text_min_df = tokenize_columns(df, ['blurb', 'name'])
+df['text'] = df['blurb'] + df['name']
+print(df.head())
 
-# Stop words filtering
-# Initialize stop words
+# Stop_words
 stop_words = set(stopwords.words('english'))
-print(stop_words)
 stop_words.update([",", "."])
 
-# stop_words_filtering
-def stop_words_filtering(df) : 
+def get_frequency_score(sentence, freqs, stop_words):
+    '''
+    frequence score 
+    '''
+    sentence = sentence.replace('?', '').\
+                        replace('!', '').\
+                        replace(':', '').\
+                        replace('"', '').\
+                        replace("'", '').\
+                        replace('.', '').\
+                        replace(',', '').lower()
     
-    for cname in df.columns:
-        new_cname =  map(lambda x: df[cname].name + '_wo_stop' + x)
-        df[new_cname] = df[cname].apply(lambda x: [word for word in x if word not in stop_words])
-        print(new_cname)
-    return df
+    sentence_words = [word for word in sentence.split() if word not in stop_words]
 
-text_min_wo_stop_df = stop_words_filtering(text_min_df)
-    
-#lemmanisation
+    return np.mean([freqs[word] for word in sentence_words])
 
-#Split by category
 
-#Frequency by category and failed/successful
+# Failed/successful:
+f_s = ['successful', 'failed']
 
-#index frequent words failed/success
+print(df.columns[40:40])
+#category
+cats = df['category_parent_name_ori'].unique()
+print(cats)
 
-#wordcloud by category and failed successful
 
-#put indexes back with the rest of variables
 
-#text_min_df.to_hdf("../../data/text_mining_subset.h5", key="english")
+wc = wordcloud.WordCloud(stopwords=stop_words)
+
+for cat in cats:
+    for s in f_s:
+        df_sub = df[(df['category_parent_name_ori']==cat) & (df['state']==s)]
+        text = ""
+        for comment in df_sub.text : 
+            text += comment
+        # lower case
+        wc.generate(text.lower())
+        for row in df_sub['text']:
+            df_sub['frequency_score'] = get_frequency_score(row, wc.words_, stop_words)
 
 '''
 Next: user_rate (based on project failure(-1)/success(+1) user history)
