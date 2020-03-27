@@ -5,7 +5,7 @@
 Pre-processing of Kickstarter_2020-02-13T03_20_04_893Z.
 Text mining. Filter projects with blurb or name not in English
 Input Filename: data_wo_text_mining.h5, words_dictionary.json (from https://github.com/dwyl/english-words/blob/master/words_dictionary.json)
-Output Filename: data_text_mining.h5
+Output Filename: data_english.h5
 
 Copyright (c) 2020 Gloria G. Curto.
 http://gloriagcurto.info
@@ -14,8 +14,6 @@ http://gloriagcurto.info
 import json
 import sys
 import pandas as pd
-import glob
-import csv
 
 def get_english_score(sentence):
     '''
