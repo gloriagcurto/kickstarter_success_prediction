@@ -93,5 +93,5 @@ for cat in cats:
     df_freqs = pd.concat([df_freqs, df_sub], axis=0)
 df_freqs.to_hdf("../../data/data_frequency_score.h5", key="frequency_score")
 '''
-Next: user_rate (based on project failure(-1)/success(+1) user history)
+Next: user_rate (based on project failure(-1)|success(+1)/n_projects user history)
 '''
