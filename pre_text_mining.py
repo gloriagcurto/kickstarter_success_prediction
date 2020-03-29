@@ -58,8 +58,6 @@ print(df.columns[40:40])
 cats = df['category_parent_name_ori'].unique()
 print(cats)
 
-
-
 wc = wordcloud.WordCloud(stopwords=stop_words, max_words=2000000)
 df_freqs = pd.DataFrame()
 for cat in cats:
