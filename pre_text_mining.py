@@ -5,7 +5,7 @@
 Pre-processing of Kickstarter_2020-02-13T03_20_04_893Z.
 Text mining. Tokenize, frequent words by category
 Input Filename:  data_english.h5
-Output Filename: data_text_mining.h5
+Output Filename: data_frequency_score.h5
 
 Copyright (c) 2020 Gloria G. Curto.
 http://gloriagcurto.info
@@ -66,9 +66,7 @@ for cat in cats:
     print(f'Category: {cat}')
     for s in f_s:
         df_sub = df.loc[(df.category_parent_name_ori==cat) & (df.state==s)]
-        text = ""
-        for comment in df_sub.text : 
-            text += comment
+        text = " ".join([comment for comment in df_sub.text])
         text = text.replace('?', '').\
                         replace('!', '').\
                         replace(':', '').\
@@ -81,16 +79,18 @@ for cat in cats:
         #text_list = text_list.lower()
         #Stemming
         ps = PorterStemmer()
-        stemmed_words_text=[]
-        for w in text_list:
-            stemmed_words_text.append(ps.stem(w))
+        stemmed_words_text = [ps.stem(w) for w in text_list]
+        
         #Frequency distribution in the category
         frequency_score = []
         for row in df_sub['text']:
            frequency_score.append(get_frequency_score(row, FreqDist(stemmed_words_text) , stop_words))
                    
-        df_sub.loc[:,'frequency_score']= frequency_score
-    df_freqs = pd.concat([df_freqs, df_sub], axis=0)
+        df_sub.loc[:,'frequency_score'] = frequency_score
+    df_sub_f_s = pd.concat([df_sub_f_s, df_sub], axis=0)
+
+df_freqs = pd.concat([df_freqs, df_sub_f_s], axis=0)
+
 df_freqs.to_hdf("../../data/data_frequency_score.h5", key="frequency_score")
 '''
 Next: user_rate (based on project failure(-1)|success(+1)/n_projects user history)
