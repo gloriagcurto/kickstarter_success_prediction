@@ -53,17 +53,18 @@ def get_frequency_score(sentence, freqs, stop_words):
 # Failed/successful:
 f_s = ['successful', 'failed']
 
-print(df.columns[40:40])
 #category
 cats = df['category_parent_name_ori'].unique()
 print(cats)
 
-wc = wordcloud.WordCloud(stopwords=stop_words, max_words=2000000)
+#wc = wordcloud.WordCloud(stopwords=stop_words, max_words=2000000)
 df_freqs = pd.DataFrame()
+
 for cat in cats:
     print(f'Category: {cat}')
     for s in f_s:
-        df_sub = df.loc[(df.category_parent_name_ori==cat) & (df.state==s)]
+        print(f'State: {s}')
+        df_sub = df.loc[(df.category_parent_name_ori==cat) & (df.state_grouped==s)]
         text = " ".join([comment for comment in df_sub.text])
         text = text.replace('?', '').\
                         replace('!', '').\
@@ -80,16 +81,19 @@ for cat in cats:
         stemmed_words_text = [ps.stem(w) for w in text_list]
         
         #Frequency distribution in the category
+
         frequency_score = []
+        freq_dist = FreqDist(stemmed_words_text)
         for row in df_sub['text']:
-           frequency_score.append(get_frequency_score(row, FreqDist(stemmed_words_text) , stop_words))
+           frequency_score.append(get_frequency_score(row, freq_dist, stop_words))
                    
         df_sub.loc[:,'frequency_score'] = frequency_score
-    df_sub_f_s = pd.concat([df_sub_f_s, df_sub], axis=0)
-
-df_freqs = pd.concat([df_freqs, df_sub_f_s], axis=0)
+        df_freqs = pd.concat([df_freqs, df_sub], axis=0)
 
 df_freqs.to_hdf("../../data/data_frequency_score.h5", key="frequency_score")
 '''
-Next: user_rate (based on project failure(-1)|success(+1)/n_projects user history)
+next = 
+id = use as index at the end. Check unique ids/nrow
+duplicate data:  df EDA and df timeseries (drop_columns=['category_name', 'category_parent_name',
+'location_expanded_country', 'text', 'blurb', 'name','state', 'state_grouped'] in features matrix))
 '''
