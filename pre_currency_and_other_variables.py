@@ -39,7 +39,7 @@ no_json_dates['usd_goal'].head()
 #No need: goal and static_usd_rate
 no_json_dates.drop(columns=['goal', 'static_usd_rate'], inplace=True)
 
-# Drop 'is_starrable' because I don't know what it is
+# Drop 'is_starrable' because of lack of relevance
 no_json_dates.drop(columns=['is_starrable'], inplace=True)
 
 #binary encoding : 'disable_communication', 'spotlight', 'staff_pick'
