@@ -49,7 +49,7 @@ def freq_dict(df, cat, state, stop_words):
     df_sub = df.loc[(df.category_parent_name_ori==cat) & (df.state_grouped==state)]
     text = df_to_text(df_sub)
     return compute_freq(text, stop_words)
-
+'''
 def dict_difference(dict1, dict2):
     return {key: value for (key, value) in dict1.items() if key not in dict2}
 
@@ -59,7 +59,7 @@ def freq_unique_words(df, cat, stop_words):
     freq_suc_u = dict_difference(freq_suc, freq_fail)
     freq_fail_u = dict_difference(freq_fail, freq_suc)
     return freq_suc_u, freq_fail_u
-
+'''
 def select_keywords(dictionary, n):
     keywords = [k for (k, v) in sorted(dictionary.items(), key=lambda item: item[1], reverse = True)]
     return keywords[:n]
@@ -89,12 +89,12 @@ def get_frequency_score(sentence, keywords_suc, keywords_fail, stop_words):
     score_neg = sum([keywords_fail[word] for word in stemmed_words if word in keywords_fail])
     return score_pos - score_neg
 
-def word_cloud_cat_state(df, cat, state, background_color, stop_words, max_words):
+def word_cloud_cat_state(df, cat, state, background_color, stop_words, max_words, colormap):
     df_sub_s = df.loc[df.state_grouped==state]
     text = df_to_text(df_sub_s)
-    output_path = os.path.join("../../images/wordcloud_" + cat + "_" + state + ".pdf")
+    output_path = os.path.join("../../images/wordclouds/wc_" + cat + "_" + state + ".pdf")
     # Définir le calque du nuage des mots
-    wc = WordCloud(background_color=background_color, max_words=max_words, stopwords=stop_words, max_font_size=50, random_state=37)
+    wc = WordCloud(background_color=background_color, max_words=max_words, stopwords=stop_words, max_font_size=50, random_state=37, colormap=colormap )
     # Générer et afficher le nuage de mots
     plt.figure() #figsize= (20,10)
     wc.generate(text).to_file(output_path)
@@ -116,12 +116,24 @@ print(cats)
 df_freqs = pd.DataFrame()
 for cat in cats:
     print(f'Category: {cat}') 
+    ''' # set difference frequency score
     freq_suc_u, freq_fail_u = freq_unique_words(df, cat, stop_words)
     keywords_suc = keywords_filter(select_keywords(freq_suc_u, 50), freq_suc_u)
     keywords_fail = keywords_filter(select_keywords(freq_fail_u, 50), freq_fail_u)
     df_sub = df.loc[df.category_parent_name_ori==cat]
-    word_cloud_cat_state(df_sub, cat, 'successful', 'white', stop_words, 200)
-    word_cloud_cat_state(df_sub, cat, 'failed', 'white', stop_words, 200)
+    word_cloud_cat_state(df_sub, cat, 'successful', 'white', stop_words, 200, 'winter')
+    word_cloud_cat_state(df_sub, cat, 'failed', 'white', stop_words, 200, 'autumn_r')
+    frequency_score = [get_frequency_score(row, keywords_suc, keywords_fail, stop_words) for row in df_sub['text']]
+    df_sub.loc[:,'frequency_score'] = frequency_score
+    df_freqs = pd.concat([df_freqs, df_sub], axis=0)
+    '''
+    freq_suc_u = freq_dict(df, cat, 'successful', stop_words)
+    freq_fail_u = freq_dict(df, cat, 'failed', stop_words)
+    keywords_suc = keywords_filter(select_keywords(freq_suc_u, 200), freq_suc_u)
+    keywords_fail = keywords_filter(select_keywords(freq_fail_u, 200), freq_fail_u)
+    df_sub = df.loc[df.category_parent_name_ori==cat]
+    word_cloud_cat_state(df_sub, cat, 'successful', 'white', stop_words, 200, 'winter')
+    word_cloud_cat_state(df_sub, cat, 'failed', 'white', stop_words, 200, 'autumn_r')
     frequency_score = [get_frequency_score(row, keywords_suc, keywords_fail, stop_words) for row in df_sub['text']]
     df_sub.loc[:,'frequency_score'] = frequency_score
     df_freqs = pd.concat([df_freqs, df_sub], axis=0)
