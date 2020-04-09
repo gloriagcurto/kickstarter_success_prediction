@@ -123,10 +123,10 @@ df.drop(to_drop, axis=1, inplace=True)
 
 print(f'Dimensions after pruning: {df.shape}')
 
-df.to_hdf("../../data/data_wo_text_mining_currency.h5", key = 'country_pruning')
+df.to_hdf("../../data/data_wo_text_mining_currency.h5", key = 'currency_pruning')
 
 '''
-size: 119
+size: 115
 Next: filter english texts with pre_words.py
 '''
 
