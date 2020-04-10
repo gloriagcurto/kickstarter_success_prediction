@@ -21,7 +21,3 @@ print(df_raw.head())
 print(df_raw.shape)
 raw_profile = pandas_profiling.ProfileReport(df_raw, title='Raw data EDA profiling report', html={'style':{'full_width':True}})
 raw_profile.to_file(output_file="../../EDA_profiles/EDA_raw_profile.html")
-
-#train =
-#test = 
-#pandas_profiling.ProfileReport(df)
