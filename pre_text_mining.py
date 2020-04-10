@@ -85,9 +85,9 @@ def get_frequency_score(sentence, keywords_suc, keywords_fail, stop_words):
     # Stemming
     ps = PorterStemmer()
     stemmed_words = [ps.stem(w) for w in sentence_words]
-    score_pos = sum([keywords_suc[word] for word in stemmed_words if word in keywords_suc])
-    score_neg = sum([keywords_fail[word] for word in stemmed_words if word in keywords_fail])
-    return score_pos - score_neg
+    score_pos = sum([keywords_suc[word] for word in keywords_suc if word in stemmed_words])
+    score_neg = sum([keywords_fail[word] for word in keywords_fail if word in stemmed_words])
+    return (score_pos - score_neg) / len(stemmed_words)
 
 def word_cloud_cat_state(df, cat, state, background_color, stop_words, max_words, colormap):
     df_sub_s = df.loc[df.state_grouped==state]
@@ -98,6 +98,7 @@ def word_cloud_cat_state(df, cat, state, background_color, stop_words, max_words
     # Générer et afficher le nuage de mots
     plt.figure() #figsize= (20,10)
     wc.generate(text).to_file(output_path)
+    plt.close()
 
 # Generate text column
 df = pd.read_hdf('../../data/data_english.h5')

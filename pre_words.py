@@ -75,5 +75,6 @@ print(f'Dimensions of English filtered data: {df.shape}')
 english_df.to_hdf("../../data/data_english.h5", key="english")
 
 '''
-Next: compute number of rows that account for 30% of data. Select the 30% newest projects according to state_changed_at date (test set)
+Next:
+pre_split_train_test, then text mining
 '''

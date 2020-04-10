@@ -49,17 +49,15 @@ print(deserialized.iloc[:,60:70].agg(['count', 'size', 'nunique']))
 
 # After visualization of the column contents and evaluation of number of unique values and missing values, drop the following columns because they might not be informative enough. Serveral columns to drop include urls.
 
-columns_to_drop = ['category_position', 'category_parent_id', 'category_id', 'category_color', 'category_urls.web.discover',
-                   'creator_id','creator_name','creator_slug', 'creator_is_registered', 'creator_chosen_currency',
+columns_to_drop = ['category_position', 'category_parent_id', 'category_id', 'category_color', 'category_urls.web.discover','creator_id',
+                   'creator_name','creator_slug', 'creator_is_registered', 'creator_chosen_currency',
                    'creator_is_superbacker', 'creator_avatar.thumb', 'creator_avatar.small', 'creator_avatar.medium',
                    'creator_urls.web.user', 'creator_urls.api.user', 'location_id', 'location_name', 'location_slug',
                    'location_short_name', 'location_displayable_name', 'location_state', 'location_type', 'location_is_root',
                    'location_urls.web.discover', 'location_urls.web.location', 'location_urls.api.nearby_projects', 'photo_key',
                    'photo_full', 'photo_ed', 'photo_med', 'photo_little', 'photo_small', 'photo_thumb', 'photo_1024x576', 'photo_1536x864',
-                    'profile_id', 'profile_project_id', 'profile_state_changed_at', 'profile_background_image_opacity', 'profile_feature_image_attributes.image_urls.default', 'profile_feature_image_attributes.image_urls.baseball_card',
-                   'profile_background_image_attributes.id', 'profile_background_image_attributes.image_urls.default',
-                   'profile_background_image_attributes.image_urls.baseball_card', 'profile_feature_image_attributes.id',
-                   'urls_web.project', 'urls_web.rewards', 'urls_api.star', 'urls_api.message_creator', 'urls_web.message_creator']
+                    'profile_id', 'profile_project_id', 'profile_state_changed_at', 'profile_background_image_attributes.id', 'profile_background_image_attributes.image_urls.default', 'profile_background_image_attributes.image_urls.baseball_card',
+                 'profile_feature_image_attributes.id', 'urls_web.project', 'urls_web.rewards', 'urls_api.star', 'urls_api.message_creator', 'urls_web.message_creator']
 
 deserialized.drop(columns_to_drop, axis=1, inplace=True)
 
@@ -121,8 +119,11 @@ print(deserialized.iloc[:,3:15].head())
 
 # The rest of the profile related columns are going to be coded in a binary choice variable (0= missing value, 1= variable contains a project creator provided value)
 # ['profile_name', 'profile_blurb', 'profile_background_color', 'profile_text_color', 'profile_link_background_color', 'profile_link_text_color', 'profile_link_text', 'profile_link_url']
-
-profile_var = ['profile_name', 'profile_blurb', 'profile_background_color', 'profile_text_color', 'profile_link_background_color', 'profile_link_text_color', 'profile_link_text', 'profile_link_url']
+#  'profile_background_image_opacity', 'profile_feature_image_attributes.image_urls.default', 'profile_feature_image_attributes.image_urls.baseball_card',
+#                  'profile_background_image_attributes.id', 'profile_background_image_attributes.image_urls.default',
+#                  'profile_background_image_attributes.image_urls.baseball_card', 'profile_feature_image_attributes.id',
+profile_var = ['profile_name', 'profile_blurb', 'profile_background_color', 'profile_text_color',
+                  'profile_link_background_color', 'profile_link_text_color', 'profile_link_text', 'profile_link_url']
 
 for column in profile_var :
     deserialized.loc[:, column].replace([None,""],[0, 0], inplace=True)
@@ -130,6 +131,7 @@ for column in profile_var :
 
 
 print(deserialized.iloc[:,3:15].head())
+print(deserialized.iloc[:,20:25].head())
 
 # One hot encoding of categorical variables.
 # Keep the original columns for dataviz.
