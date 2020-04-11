@@ -4,8 +4,8 @@
 """
 Pre-processing of Kickstarter_2020-02-13T03_20_04_893Z.
 Text mining. Tokenize, filter stop words, stemming. Compute frequent words by category, succesful or failed (remove words in common). Compute score by category (+ freq if word in successful, - frequency if word in failed)
-Input Filename:  train_wo_frequency_score.h5, test_wo_frequency_score.h5
-Output Filename: train_frequency_score.h5, test_frequency_score.h5
+Input Filename:  train_ts_wo_frequency_score.h5, test_ts_wo_frequency_score.h5
+Output Filename: train_ts_frequency_score.h5, test_ts_frequency_score.h5
 
 Copyright (c) 2020 Gloria G. Curto.
 http://gloriagcurto.info
@@ -101,12 +101,12 @@ def word_cloud_cat_state(df, cat, state, background_color, stop_words, max_words
     plt.close()
 
 # Generate text column
-df = pd.read_hdf('../../data/train_wo_frequency_score.h5')
+df = pd.read_hdf('../../data/train_ts_wo_frequency_score.h5')
 df['text'] = df['blurb'] + df['name']
 print(df.head())
 
 # test
-df_test = pd.read_hdf('../../data/test_wo_frequency_score.h5')
+df_test = pd.read_hdf('../../data/test_ts_wo_frequency_score.h5')
 df_test['text'] = df_test['blurb'] + df_test['name']
 print(df_test.head())
 
@@ -142,16 +142,16 @@ for cat in cats:
     keywords_suc = keywords_filter(select_keywords(freq_suc_u, 200), freq_suc_u)
     keywords_fail = keywords_filter(select_keywords(freq_fail_u, 200), freq_fail_u)   
     df_sub = df.loc[df.category_parent_name_ori==cat]
-    word_cloud_cat_state(df_sub, cat, 'successful', 'white', stop_words, 200, 'winter', 'train')
-    word_cloud_cat_state(df_sub, cat, 'failed', 'white', stop_words, 200, 'autumn_r', 'train')
+    word_cloud_cat_state(df_sub, cat, 'successful', 'white', stop_words, 200, 'winter', 'train_ts')
+    word_cloud_cat_state(df_sub, cat, 'failed', 'white', stop_words, 200, 'autumn_r', 'train_ts')
     frequency_score = [get_frequency_score(row, keywords_suc, keywords_fail, stop_words) for row in df_sub['text']]
     df_sub.loc[:,'frequency_score'] = frequency_score
     df_freqs = pd.concat([df_freqs, df_sub], axis=0)
     #computes score in test
     if cat in cats_test:
         df_test_sub = df_test.loc[df_test.category_parent_name_ori==cat]
-        word_cloud_cat_state(df_test_sub, cat, 'successful', 'white', stop_words, 200, 'winter', 'test')
-        word_cloud_cat_state(df_test_sub, cat, 'failed', 'white', stop_words, 200, 'autumn_r', 'test')
+        word_cloud_cat_state(df_test_sub, cat, 'successful', 'white', stop_words, 200, 'winter', 'test_ts')
+        word_cloud_cat_state(df_test_sub, cat, 'failed', 'white', stop_words, 200, 'autumn_r', 'test_ts')
         test_frequency_score = [get_frequency_score(row, keywords_suc, keywords_fail, stop_words) for row in df_test_sub['text']]
         df_test_sub.loc[:,'frequency_score'] = test_frequency_score
         df_test_freqs = pd.concat([df_test_freqs, df_test_sub], axis=0)
@@ -162,11 +162,10 @@ df_test_freqs.drop(['category_parent_name_ori', 'state_grouped'], axis=1, inplac
 print(f'Dimensions of train: {df_freqs.shape}')
 print(f'Dimensions of test: {df_test_freqs.shape}')
 
-df_freqs.to_hdf("../../data/train_frequency_score.h5", key="frequency_score")
-df_test_freqs.to_hdf("../../data/test_frequency_score.h5", key="frequency_score")
+df_freqs.to_hdf("../../data/train_ts_frequency_score.h5", key="frequency_score")
+df_test_freqs.to_hdf("../../data/test_ts_frequency_score.h5", key="frequency_score")
 
 '''
-
-next = time series train and test
+next
 split features and target model training, scatter plot year /successful or failed, corr and profiling train and test before model training
 '''
