@@ -41,7 +41,7 @@ data.to_hdf("../../data/data_wo_text_mining.h5", key = 'data_wo_text_mining')
 
 '''
 next:
-blurb, name => text mining
+check and remove duplicates
 # 
 # id = use as index at the end
 # 
