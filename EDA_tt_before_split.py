@@ -4,8 +4,8 @@
 """
 EDA Kickstarter_2020-02-13T03_20_04_893Z.
 profile reports
-Input Filename: joined.csv, train, test 
-Output Filename: raw_profile, train_profile, test_profile
+Input Filename: 
+Output Filename: EDA_tt_ts_split_profile.html
 
 Copyright (c) 2020 Gloria G. Curto.
 http://gloriagcurto.info
@@ -22,6 +22,3 @@ print(df.shape)
 
 profile = pandas_profiling.ProfileReport(df, title='Test and training before splitting EDA profiling report', html={'style':{'full_width':True}})
 profile.to_file(output_file="../../EDA_profiles/EDA_tt_before_split_profile.html")
-
-
-
