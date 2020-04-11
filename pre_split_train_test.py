@@ -26,7 +26,7 @@ with open('../../data/colnames.txt', "w") as output:
 
 print(f'Dimensions before pruning: {df.shape}')
 
-to_drop = ['backers_count','state', 'created_at', 'deadline', 'launched_at', 'id', 'usd_pledged', 'weekday_state_changed_at', 'month_state_changed_at', 'found_rising_duration', 'currency_orig', 'category_name_ori', 'category_parent_name_ori', 'location_expanded_country_ori']
+to_drop = ['backers_count','state', 'created_at', 'deadline', 'launched_at', 'id', 'usd_pledged', 'weekday_state_changed_at', 'month_state_changed_at', 'found_rising_duration', 'currency_orig', 'category_name_ori', 'location_expanded_country_ori']
 
 print(f'Dimensions of columns to drop: {len(to_drop)}')
 
@@ -65,7 +65,7 @@ I also do a random train test split.
 '''
 # Temporal series split
 #Remove unwanted variables
-df.drop(['state_changed_at', 'state_grouped'], axis=1, inplace=True)
+df.drop('state_changed_at', axis=1, inplace=True)
 
 print(f'Dimensions: {df.shape}')
 
