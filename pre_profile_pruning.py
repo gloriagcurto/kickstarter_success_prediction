@@ -4,7 +4,7 @@
 '''
 Pre-processing of Kickstarter_2020-02-13T03_20_04_893Z.
 Profile variables pruning
-Input Filename: data_wo_text_mining.h5
+Input Filename: data_nd_wo_text_mining.h5
 Output Filename: data_wo_text_mining_profile.h5
 
 Copyright (c) 2020 Gloria G. Curto.
@@ -15,7 +15,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-df = pd.read_hdf('../../data/data_wo_text_mining.h5')
+df = pd.read_hdf('../../data/data_nd_wo_text_mining.h5')
 print(df.shape)
 
 print(df.iloc[:, 50:57].head(3))
