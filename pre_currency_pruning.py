@@ -97,13 +97,13 @@ print(p_success.head(10))
 print(f'Percentage of success: {(df[df.state_grouped=="successful"].size/df.size)*100}')
 print(f'Percentage of failure: {(df[df.state_grouped=="failed"].size/df.size)*100}')
 
-# Keep currencies with a percentage of successful projects of at least 60% 
-keep_p = p_success[p_success.percentages >= 60]
-print(f'Number of currencies with more than 60% of successful projects: {len(keep_p)}')
+# Keep currencies with a percentage of successful projects of at least 55% 
+keep_p = p_success[p_success.percentages >= 55]
+print(f'Number of currencies with more than 55% of successful projects: {len(keep_p)}')
 keep = keep_p.merge(right=df_counts, how='inner', left_on='currencies', right_on='currency')
-keep.to_csv('../../data/keep_currencies_60success.csv')
+keep.to_csv('../../data/keep_currencies_55success.csv')
 '''
-Keep currencies with more than 60% of successful projects ands more than 50 projects:
+Keep currencies with more than 55% of successful projects ands more than 50 projects:
 currencies:
 GBP, HKD, SGD, JPY 
 
@@ -126,7 +126,7 @@ print(f'Dimensions after pruning: {df.shape}')
 df.to_hdf("../../data/data_wo_text_mining_currency.h5", key = 'currency_pruning')
 
 '''
-size: 115
+size: 112
 Next: filter english texts with pre_words.py
 '''
 
