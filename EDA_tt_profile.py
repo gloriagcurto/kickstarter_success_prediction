@@ -15,14 +15,14 @@ import pandas as pd
 import pandas_profiling
 
 
-df = pd.read_hdf("../../data/test_frequency_score.h5.h5")
+df = pd.read_hdf("../../data/test_frequency_score.h5")
 
 print(df.shape)
 
 profile = pandas_profiling.ProfileReport(df, title='Test EDA profiling report', html={'style':{'full_width':True}})
 profile.to_file(output_file="../../EDA_profiles/EDA_test_profile.html")
 
-df = pd.read_hdf("../../data/train_frequency_score.h5.h5")
+df = pd.read_hdf("../../data/train_frequency_score.h5")
 
 print(df.shape)
 
