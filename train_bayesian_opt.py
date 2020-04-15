@@ -1,0 +1,134 @@
+#!/usr/bin/python
+# -*- coding:utf-8 -*-
+
+"""
+XGBoost traiing Kickstarter_2020-02-13T03_20_04_893Z.
+Model training, binary classification, bayesian optimization
+Input Filename: train, test , train_ts, test_ts
+Output Filename: 
+
+Copyright (c) 2020 Gloria G. Curto.
+http://gloriagcurto.info
+"""
+
+import pandas as pd
+import xgboost as xgb
+from sklearn.metrics import classification_report, confusion_matrix
+from bayes_opt import BayesianOptimization
+from sklearn.metrics import mean_squared_error
+
+X_train = pd.read_hdf('../../data/data_model/X_train.h5')
+y_train = pd.read_hdf('../../data/data_model/y_train.h5')
+
+X_test =  pd.read_hdf('../../data/data_model/X_test.h5')
+y_test =  pd.read_hdf('../../data/data_model/y_test.h5')
+
+'''
+#Converting the dataframe into XGBoost’s Dmatrix object
+dtrain = xgb.DMatrix(data=X_train, label=y_train)
+dtest = xgb.DMatrix(data=X_test, label=y_test)
+'''
+#Initializing an XGBClassifier with default parameters and fitting the training data
+'''
+from sklearn.utils import shuffle
+y_train = shuffle(y_train)
+'''
+y_train = y_train.sample(frac=1).reset_index(drop=True)
+xgbcl1 = xgb.XGBClassifier(objective='binary:logistic').fit(X_train, y_train)
+#Predicting for training set
+pred_train_1 = xgbcl1.predict(X_train)
+
+
+#Printing the classification report
+
+print(classification_report(y_train, pred_train_1))
+
+#Accuracy obtained on the training set
+cm = confusion_matrix(y_train, pred_train_1)
+acc = cm.diagonal().sum()/cm.sum()
+print(acc)
+
+#Predicting for test
+pred_test_1 = xgbcl1.predict(X_test)
+
+
+#Printing the classification report
+
+print(classification_report(y_test, pred_test_1))
+
+#Accuracy obtained on the training set
+cm_t= confusion_matrix(y_test, pred_test_1)
+acc_t = cm.diagonal().sum()/cm.sum()
+print(acc_t)
+print(f'Confusion matrix test: {cm_t}')
+
+'''
+
+#Bayesian Optimization function for xgboost
+#specify the parameters you want to tune as keyword arguments
+def bo_tune_xgb(objective, max_depth, gamma, n_estimators ,learning_rate):
+    params = {'objective': objective,
+              'max_depth': int(max_depth),
+              'gamma': gamma,
+              'n_estimators': int(n_estimators),
+              'learning_rate':learning_rate,
+              'subsample': 0.8,
+              'eval_metric': ['error', 'auc']}
+
+    #Cross validating with the specified parameters in 5 folds and 70 iterations
+    cv_result = xgb.cv(params, dtrain,  num_boost_round=70, nfold=5, early_stopping_rounds=100, as_pandas=True,  seed=37)
+    return cv_result
+#(cv_results["test-auc-mean"]).iloc[-1])
+
+#Invoking the Bayesian Optimizer with the specified parameters to tune
+xgb_bo = BayesianOptimization(bo_tune_xgb, {'objective':'binary:logistic',
+                                             'max_depth': (3, 10),
+                                             'gamma': (0, 5),
+                                             'learning_rate':(0, 1),
+                                             'n_estimators':(100, 150),
+                                            })
+#print(xgb_bo.columns)
+
+#performing Bayesian optimization for 5 iterations with 8 steps of random exploration with an #acquisition function of expected improvement
+xgb_bo.maximize(n_iter=5, init_points=8, acq='ei')
+
+#Extracting the best parameters
+params = xgb_bo.max['params']
+print(params)
+
+#Converting the max_depth and n_estimator values from float to int
+params['max_depth']= int(params['max_depth'])
+params['n_estimators']= int(params['n_estimators'])
+
+#Initialize an XGBClassifier with the tuned parameters and fit the training data
+
+xgbcl2 = XGBClassifier(**params ).fit(X_train, y_train)
+
+#predicting for training set
+pred_train_2 = xgbcl2.predict(X_train)
+
+#Looking at the classification report
+print(classification_report(pred_train_2, y_train))
+
+#Attained prediction accuracy on the training set
+cm = confusion_matrix(pred_train_2, y_train)
+acc = cm.diagonal().sum()/cm.sum()
+print(acc)
+
+'''
+#Save model
+
+xgbcl1.save_model('../../results/model/xgb_binLog_cl1_bay_opt_wo_ts.model')
+
+'''
+# dump model
+xgbcl1.dump_model('../../results/model/dump.raw.txt')
+# dump model with feature map
+xgbcl1.dump_model('../../results/model/dump.raw.txt', '../../results/model/featmap.txt')
+
+
+#A saved model can be loaded as follows:
+
+bst = xgb.Booster({'nthread': 4})  # init model
+bst.load_model('model.bin')  # load data
+'''
