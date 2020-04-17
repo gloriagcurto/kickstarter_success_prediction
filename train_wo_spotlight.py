@@ -13,7 +13,8 @@ http://gloriagcurto.info
 
 import pandas as pd
 import matplotlib.pyplot as plt
-import xgboost as xgb
+import xgboost as xgb 
+import shap
 from sklearn.metrics import classification_report, confusion_matrix
 from bayes_opt import BayesianOptimization
 
@@ -61,7 +62,7 @@ def eval_metrics (y_true, y_pred,output_path, file_prefix):
     #Printing the classification report
     output_filename = output_path + file_prefix + "_class_report.tex"
     report = classification_report(y_true, y_pred, output_dict=True)
-    print()
+    print(report)
     pd.DataFrame(report).transpose().to_latex(buf=output_filename)
 
     #confusion matrix
@@ -69,6 +70,24 @@ def eval_metrics (y_true, y_pred,output_path, file_prefix):
     print(f'Confusion matrix: {cm}')
     output_filename = output_path + file_prefix + "_confusion_matrix.tex"
     pd.DataFrame(cm).to_latex(buf=output_filename)
+
+
+def bo_tune_xgb(max_depth, gamma, subsample, learning_rate):
+    '''
+    Bayesian Optimization function for xgboost
+    Specify the parameters you want to tune as keyword arguments
+    '''
+    params = {'objective': 'binary:logistic',
+              'max_depth': int(max_depth),
+              'gamma': gamma,
+              'learning_rate':learning_rate,
+              'subsample': subsample,
+              'eval_metric': 'auc'}
+
+    #Cross validating with the specified parameters in 5 folds and 100 iterations
+    cv_results = xgb.cv(params, dtrain,  num_boost_round=100, nfold=5, early_stopping_rounds=100, as_pandas=True,  seed=37)
+    return cv_results["test-auc-mean"].iloc[-1]
+
 
 plt.close("all")
 
@@ -105,28 +124,13 @@ eval_metrics (y_test, pred_test_1,"../../results/model/eval_metrics/", 'xgbcl_wo
 plot_model_interpretation_xgb (xgbcl_wo_spot, '../../results/model/xgb_plots/', 'xgbcl_wo_spot')
 
 xgbcl_wo_spot.save_model('../../results/model/xgb_binLog_cl_wo_spot_wo_ts.model')
-
-
-#Bayesian Optimization function for xgboost
-#specify the parameters you want to tune as keyword arguments
-def bo_tune_xgb(max_depth, gamma, n_estimators ,learning_rate):
-    params = {'objective': 'binary:logistic',
-              'max_depth': int(max_depth),
-              'gamma': gamma,
-              'n_estimators': int(n_estimators),
-              'learning_rate':learning_rate,
-              'subsample': 0.8,
-              'eval_metric': 'auc'}
-
-    #Cross validating with the specified parameters in 5 folds and 70 iterations
-    cv_results = xgb.cv(params, dtrain,  num_boost_round=70, nfold=5, early_stopping_rounds=100, as_pandas=True,  seed=37)
-    return cv_results["test-auc-mean"].iloc[-1]
-
+'''
+# Hyper parameter bayesian optimization 
 #Invoking the Bayesian Optimizer with the specified parameters to tune
-xgb_bo = BayesianOptimization(bo_tune_xgb, { 'max_depth': (3, 5),
-                                             'gamma': (0, 5),
-                                             'learning_rate':(0, 1),
-                                             'n_estimators':(100, 500)
+xgb_bo = BayesianOptimization(bo_tune_xgb, { 'max_depth': (3, 8), # default 6
+                                             'gamma': (0, 5), # default 0
+                                             'learning_rate':(0, 1), #default 0.3
+                                             'subsample':(0, 1) # default 1
                                             })
 #print(xgb_bo.columns)
 
@@ -139,7 +143,6 @@ print(params)
 
 #Converting the max_depth and n_estimator values from float to int
 params['max_depth']= int(params['max_depth'])
-params['n_estimators']= int(params['n_estimators'])
 
 #Initialize an XGBClassifier with the tuned parameters and fit the training data
 
@@ -160,3 +163,48 @@ eval_metrics (y_test, pred_test_bo,"../../results/model/eval_metrics/", 'xgbcl_b
 plot_model_interpretation_xgb (xgbcl_bo, '../../results/model/xgb_plots/', 'xgbcl_bo_wo_spot')
 
 xgbcl_bo.save_model('../../results/model/xgb_bo_binLog_cl_wo_spot_wo_ts.model')
+'''
+
+'''
+Default values model works a bit better
+'''
+# model interpretation with SHAP
+e_default = shap.TreeExplainer(xgbcl_wo_spot)
+shap_values = e_default.shap_values(X_test)
+#shap_interaction_values = e_default.shap_interaction_values(X_test)
+#X_display = X_train.columns
+
+#Bar chart of mean importance
+fig = plt.figure()
+shap.summary_plot(shap_values, X_test, plot_type="bar", show=False)
+plt.savefig('../../results/model/shap_plots/bar_chart_mean_importance_xgbcl_wo_spot_test.pdf', bbox_inches='tight')
+plt.close(fig)
+
+#Summary plot
+fig = plt.figure()
+shap.summary_plot(shap_values, X_test, plot_type='dot', show=False)
+plt.savefig('../../results/model/shap_plots/summary_plot_xgbcl_wo_spot_test.pdf', bbox_inches='tight')
+plt.close(fig)
+
+
+'''
+#Dependence plot
+for name in X_train.columns:
+    output_filename= '../../results/model/shap_plots/dependence_' + name + '_xgbcl_wo_spot_test.pdf'
+    shap.dependence_plot(name, shap_values, X_test)
+    plt.savefig(output_filename)
+    plt.close(fig)
+'''
+#force_plot
+fig = plt.figure()
+shap.force_plot(e_default.expected_value, shap_values[0,:], X_test.iloc[0,:],show=False,matplotlib=True)
+plt.savefig('../../results/model/shap_plots/force_plot_xgbcl_wo_spot_test.pdf', bbox_inches='tight')
+plt.close(fig)
+#shap.force_plot(e_default.expected_value, shap_values[0:500,:], X_test[0:500,:])
+
+'''
+shap.waterfall_plot(*args, **kwargs)
+shap.image_plot(*args, **kwargs)
+shap.decision_plot(*args, **kwargs)
+
+'''
