@@ -18,15 +18,17 @@ import seaborn as sns
 
 
 def plot_count_by_state(df, var_to_plot, cat, palette_dict, title, xlab, ylab, output_path):
-    output_filename = output_path + str(cat) + "_state.pdf"
+    output_filename = output_path + cat + "_state.pdf"
     fig = plt.figure(figsize=(20,5))
-    g = sns.countplot(x=var_to_plot, hue='state_grouped', data=df_sub, palette=palette_dict)
-    g.set_title(f' {title} {cat}')
+    g = sns.countplot(x=var_to_plot, hue='state_grouped', data=df, palette=palette_dict)
+    g.set_title(f'{title}')
     g.set_xlabel(xlab)
     g.set_ylabel(ylab)
     plt.legend(title='Project state', loc='upper left')
     plt.savefig(output_filename)
     plt.close(fig)
+
+
 
 df = pd.read_hdf("../../data/test_training_wo_text_mining.h5")
 
@@ -44,16 +46,12 @@ df_counts.columns = ['year','project_count']
 # plot counts by categories and state
 output_path = "../../images/variable_pruning_EDA/year/nprojects_" 
 var_to_plot =  'year_state_changed_at'
-title = 'Year project state changed'
+title = 'Projects by year'
 xlab=''
-ylab='Project count'
+ylab='Counts'
 palette_dict = dict(successful='#66cdaa', failed='#ff8b61')
 
-for year in df.year_state_changed_at.unique():
-    df_sub = df[df['year_state_changed_at']==year]
-    #print(year)
-    plot_count_by_state(df_sub, var_to_plot, year, palette_dict, title, xlab, ylab, output_path)
-
+plot_count_by_state(df, var_to_plot, 'year', palette_dict, title, xlab, ylab, output_path)
 # Percentage success
 
 percen = []
