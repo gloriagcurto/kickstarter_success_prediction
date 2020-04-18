@@ -33,6 +33,8 @@ def check_numeric (df):
 df = pd.read_hdf('../../data/data_frequency_score.h5')
 cols = [col for col in df.columns]
 print(cols)
+print(f'Duplicates: {df.duplicated().sum()}')
+df.drop_duplicates(keep='first', inplace=True)
 
 columns_to_drop = ['blurb', 'created_at', 'deadline', 'id', 'launched_at', 'name', 'state', 'usd_pledged',
                    'currency_orig','category_name_ori', 'category_parent_name_ori', 'location_expanded_country_ori', 
@@ -71,20 +73,28 @@ df_failed_counts.columns = ['state_changed_at','project_count']
 #Plot total number; successful and failed project counts by date
 # share x and y axis
 ax1 = plt.subplot(311)
-plt.plot('state_changed_at', 'project_count', '-k', data=df_counts)
+plt.plot('state_changed_at', 'project_count', data=df_counts, color = '#343434', label = 'All')
+plt.title('Temporal distribution of projects')
+plt.ylabel('Counts')
+plt.legend()
 plt.setp(ax1.get_xticklabels(), fontsize=6)
 
-# share x only
-ax2 = plt.subplot(312, sharex=ax1)
-plt.plot('state_changed_at', 'project_count', '-.g', data=df_success_counts)
+# share x and y
+ax2 = plt.subplot(312, sharex=ax1, sharey=ax1)
+plt.plot('state_changed_at', 'project_count', data=df_success_counts, color='#66cdaa', label = 'Successful')
+plt.ylabel('Counts')
+plt.legend()
+plt.setp(ax1.get_xticklabels(), visible=False)
 # make these tick labels invisible
 plt.setp(ax2.get_xticklabels(), visible=False)
 
 # share x and y
 ax3 = plt.subplot(313, sharex=ax1, sharey=ax1)
-plt.plot('state_changed_at', 'project_count', ':r', data=df_failed_counts)
-plt.savefig("../../images/nprojects_date_state_change.svg", format="svg")
-plt.show()
+plt.plot('state_changed_at', 'project_count', data=df_failed_counts, color='#ff8b61', label='Failed')
+plt.ylabel('Counts')
+plt.legend()
+plt.tight_layout()
+plt.savefig("../../images/nprojects_date_state_change.pdf")
 
 print('I do not see any time structure just by eye. Data are not evenly spaced and I cannot perform seasonal decomposition.')
 
@@ -98,6 +108,6 @@ results_numeric = check_numeric(df_time_series)
 print(results_numeric.columns)
 print(f'Non numeric columns: {results_numeric.loc[results_numeric.bo ==False]}')
 
-df_time_series.to_hdf("../../data/data_classification.h5", key="classification")
+#df_time_series.to_hdf("../../data/data_classification.h5", key="classification")
 '''
 '''
