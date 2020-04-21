@@ -34,7 +34,7 @@ print(df.head())
 
 df_state_sec_cat = df.loc[:,['category_name_ori', 'state_grouped']]
 print(f'Dimensions: {df_state_sec_cat.shape}')
-print('Number of secondary category levels : {df.category_name_ori.value_counts()}')
+print(f'Number of secondary category levels : {df.category_name_ori.value_counts()}')
 
 #Total projects
 df_counts = df_state_sec_cat['category_name_ori'].value_counts().sort_index().reset_index()
@@ -138,7 +138,7 @@ print(p_success.head(10))
 print(f'Percentage of success: {(df[df.state_grouped=="successful"].size/df.size)*100}')
 print(f'Percentage of failure: {(df[df.state_grouped=="failed"].size/df.size)*100}')
 
-# Keep categories with a percentage of successful projects of at least 60% and informative within parent categories 
+# Keep categories with a percentage of successful projects of at least 55% and informative within parent categories 
 keep = p_success[p_success.percentages >= 55]
 print(len(keep))
 
@@ -164,6 +164,6 @@ print(f'Dimensions after pruning: {df.shape}')
 df.to_hdf("../../data/data_wo_text_mining_cat.h5", key = 'category_pruning')
 
 '''
-size = 303
+size = 304
 Next: country variable pruning
 '''
