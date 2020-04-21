@@ -171,6 +171,6 @@ print(f'Dimensions after pruning: {df.shape}')
 df.to_hdf("../../data/data_wo_text_mining_country.h5", key = 'country_pruning')
 
 '''
-size: 128
+size: 125
 Next: currency variable pruning
 '''
