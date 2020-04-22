@@ -41,6 +41,7 @@ with open("../../data/words_dictionary.json", 'rt') as f:
     json_words = json.load(f)
 
 all_words = json_words.keys()
+print(len(all_words))
 '''
 #test
 print(get_english_score('hello what is your name dude?'))
@@ -70,8 +71,8 @@ for row in df.itertuples(index=False):
 
 english_df = pd.DataFrame(keep, columns=df.columns)
 
-print(f'Dimensions of English filtered data: {df.shape}')
-
+print(f'Dimensions of English filtered data: {english_df.shape}')
+print(f'Dimensions of non filtered data: {df.shape}')
 english_df.to_hdf("../../data/data_english.h5", key="english")
 
 '''
