@@ -24,12 +24,12 @@ def plot_model_interpretation_xgb (model, output_path, file_prefix):
     '''
     xgboost model interpretation plots 
     '''
-    
-    output_filename = output_path + file_prefix + "_tree.pdf"
-    fig = plt.figure(figsize=(100,400))
-    xgb.plot_tree(model)
+    output_filename = output_path + file_prefix + "_tree.png"
+    xgb.plot_tree(model, num_trees=2)
+    fig = plt.gcf()
+    fig.set_size_inches(15, 10)
     plt.title("Model decision tree")
-    plt.savefig(output_filename)
+    fig.savefig(output_filename)
     plt.close(fig)
     
 
@@ -61,7 +61,7 @@ def eval_metrics (y_true, y_pred,output_path, file_prefix):
 
     #Printing the classification report
     output_filename = output_path + file_prefix + "_class_report.tex"
-    report = classification_report(y_true, y_pred, output_dict=True)
+    report = classification_report(y_true, y_pred , output_dict=True)
     print(report)
     pd.DataFrame(report).transpose().to_latex(buf=output_filename)
 
@@ -124,7 +124,7 @@ eval_metrics (y_test, pred_test_1,"../../results/model/eval_metrics/", 'xgbcl_wo
 plot_model_interpretation_xgb (xgbcl_wo_spot, '../../results/model/xgb_plots/', 'xgbcl_wo_spot')
 
 xgbcl_wo_spot.save_model('../../results/model/xgb_binLog_cl_wo_spot_wo_ts.model')
-'''
+
 # Hyper parameter bayesian optimization 
 #Invoking the Bayesian Optimizer with the specified parameters to tune
 xgb_bo = BayesianOptimization(bo_tune_xgb, { 'max_depth': (3, 8), # default 6
@@ -163,7 +163,7 @@ eval_metrics (y_test, pred_test_bo,"../../results/model/eval_metrics/", 'xgbcl_b
 plot_model_interpretation_xgb (xgbcl_bo, '../../results/model/xgb_plots/', 'xgbcl_bo_wo_spot')
 
 xgbcl_bo.save_model('../../results/model/xgb_bo_binLog_cl_wo_spot_wo_ts.model')
-'''
+
 
 '''
 Default values model works a bit better
