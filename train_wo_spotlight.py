@@ -14,6 +14,7 @@ http://gloriagcurto.info
 import pandas as pd
 import matplotlib.pyplot as plt
 import xgboost as xgb 
+from joblib import dump, load
 import shap
 from sklearn.metrics import classification_report, confusion_matrix
 from bayes_opt import BayesianOptimization
@@ -124,6 +125,7 @@ eval_metrics (y_test, pred_test_1,"../../results/model/eval_metrics/", 'xgbcl_wo
 plot_model_interpretation_xgb (xgbcl_wo_spot, '../../results/model/xgb_plots/', 'xgbcl_wo_spot')
 
 xgbcl_wo_spot.save_model('../../results/model/xgb_binLog_cl_wo_spot_wo_ts.model')
+dump(xgbcl_wo_spot, '../../results/model/xgb_binLog_cl_wo_spot_wo_ts.joblib') 
 
 # Hyper parameter bayesian optimization 
 #Invoking the Bayesian Optimizer with the specified parameters to tune
@@ -163,10 +165,10 @@ eval_metrics (y_test, pred_test_bo,"../../results/model/eval_metrics/", 'xgbcl_b
 plot_model_interpretation_xgb (xgbcl_bo, '../../results/model/xgb_plots/', 'xgbcl_bo_wo_spot')
 
 xgbcl_bo.save_model('../../results/model/xgb_bo_binLog_cl_wo_spot_wo_ts.model')
-
+dump(xgbcl_bo, '../../results/model/xgb_bo_binLog_cl_wo_spot_wo_ts.joblib') 
 
 '''
-Default values model works a bit better
+Xith default values model works a bit better (better CM)
 '''
 # model interpretation with SHAP
 e_default = shap.TreeExplainer(xgbcl_wo_spot)
@@ -187,21 +189,24 @@ plt.savefig('../../results/model/shap_plots/summary_plot_xgbcl_wo_spot_test.pdf'
 plt.close(fig)
 
 
-'''
+
 #Dependence plot
 for name in X_train.columns:
-    output_filename= '../../results/model/shap_plots/dependence_' + name + '_xgbcl_wo_spot_test.pdf'
-    shap.dependence_plot(name, shap_values, X_test)
-    plt.savefig(output_filename)
+    output_filename= '../../results/model/shap_plots/dependence/dependence_' + name + '_xgbcl_wo_spot_test.pdf'
+    shap.dependence_plot(name, shap_values, X_test, show=False)
+    fig = plt.gcf()
+    fig.set_size_inches(15, 10)
+    plt.title(f"Dependence plot: {name}")
+    fig.savefig(output_filename)
     plt.close(fig)
-'''
+
+
 #force_plot
 fig = plt.figure()
 shap.force_plot(e_default.expected_value, shap_values[0,:], X_test.iloc[0,:],show=False,matplotlib=True)
 plt.savefig('../../results/model/shap_plots/force_plot_xgbcl_wo_spot_test.pdf', bbox_inches='tight')
 plt.close(fig)
 #shap.force_plot(e_default.expected_value, shap_values[0:500,:], X_test[0:500,:])
-
 '''
 shap.waterfall_plot(*args, **kwargs)
 shap.image_plot(*args, **kwargs)
